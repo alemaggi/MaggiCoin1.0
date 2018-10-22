@@ -23,7 +23,7 @@ public class Transaction {
 	
 	private static int sequence = 0; //a count of how many transaction have been generated
 	
-	//constructo
+	//constructor
 	public Transaction(PublicKey from, PublicKey to, float value,  ArrayList<TransactionInput> inputs) {
 		this.sender = from;
 		this.reciepient = to;
@@ -40,5 +40,17 @@ public class Transaction {
 				Float.toString(value) + sequence
 				);		
 	}
+
+	//Signs all the data we dont wish to be tampered with.
+	public void generateSignature(PrivateKey privateKey) {
+		String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(reciepient) + Float.toString(value)	;
+		signature = StringUtil.applyECDSASig(privateKey,data);		
+	}
+	//Verifies the data we signed hasnt been tampered with
+	public boolean verifiySignature() {
+		String data = StringUtil.getStringFromKey(sender) + StringUtil.getStringFromKey(reciepient) + Float.toString(value)	;
+		return StringUtil.verifyECDSASig(sender, data, signature);
+	}
+	//Signature will be verified by miners as new transaction are added to a block
 	
 }

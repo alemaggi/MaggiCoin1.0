@@ -1,5 +1,7 @@
 import java.util.ArrayList;
 import com.google.gson.GsonBuilder;
+import java.util.Base64;
+import java.security.Security;
 
 public class MaggiChain {
 	
@@ -9,8 +11,10 @@ public class MaggiChain {
 	//This method will need to check the hash variable is actually equal to the calculated hash, 
 	//and the previous block’s hash is equal to the previousHash variable
 	
-	public static int difficulty = 6; //quella dei litecoin è nell' ordine dei milioni
-	
+	public static int difficulty = 5; //quella dei litecoin è nell' ordine dei milioni
+	public static Wallet walletA;
+	public static Wallet walletB;
+
 	public static Boolean isChainValid() {
 		
 		Block currentBlock;
@@ -37,6 +41,24 @@ public class MaggiChain {
 				return false;
 			}
 		}
+
+		//added to test the wallet and the transaction
+		//Setup Bouncey castle as a Security Provider
+		Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider()); 
+		//Create the new wallets
+		walletA = new Wallet();
+		walletB = new Wallet();
+		//Test public and private keys
+		System.out.println("Private and public keys:");
+		System.out.println(StringUtil.getStringFromKey(walletA.privateKey));
+		System.out.println(StringUtil.getStringFromKey(walletA.publicKey));
+		//Create a test transaction from WalletA to walletB 
+		Transaction transaction = new Transaction(walletA.publicKey, walletB.publicKey, 5, null);
+		transaction.generateSignature(walletA.privateKey);
+		//Verify the signature works and verify it from the public key
+		System.out.println("Is signature verified");
+		System.out.println(transaction.verifiySignature());
+
 		return true;
 	}
 	
